@@ -2123,6 +2123,40 @@ function EquipAllWeapon()
 	end)
 end
 
+function StoreFruit()
+    for i,v in pairs(thelocal.Backpack:GetChildren()) do
+        if v:IsA("Tool") and string.find(v.Name, "Fruit") then
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("StoreFruit",v:GetAttribute("OriginalName"),v)
+        end
+    end
+end
+
+if getgenv().NoDieEffect then
+    if game:GetService("ReplicatedStorage").Effect.Container:FindFirstChild("Death") then
+        game:GetService("ReplicatedStorage").Effect.Container.Death:Destroy()
+    end
+    if game:GetService("ReplicatedStorage").Effect.Container:FindFirstChild("Respawn") then
+        game:GetService("ReplicatedStorage").Effect.Container.Respawn:Destroy()
+    end
+end
+
+_G.TargTrial = nil
+function targettrial()
+    if _G.TargTrial ~= nil then return end
+    local a = nil
+    local b = 450
+    for i,v in pairs(game.Players:GetChildren()) do
+        c = (v.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+        if c <= b and v ~= game.Players.LocalPlayer then
+            b = c 
+            a = v
+        end
+    end
+    if a == nil then return end
+    if _G.TargTrial ~= nil then return end
+    _G.TargTrial = a
+end
+
 	local plr = game.Players.LocalPlayer
 	local CbFw = debug.getupvalues(require(plr.PlayerScripts.CombatFramework))
 	local CbFw2 = CbFw[2]
@@ -2194,20 +2228,22 @@ function ClickCamera()
 
 ------AttackNoCD
 
-    local plr = game.Players.LocalPlayer
-	local CbFw = getupvalues(require(plr.PlayerScripts.CombatFramework))
+	--Hard fast
+
+	local plr = game.Players.LocalPlayer
+	local CbFw = debug.getupvalues(require(plr.PlayerScripts.CombatFramework))
 	local CbFw2 = CbFw[2]
 
-    function GetCurrentBlade() 
-        local p13 = CbFw2.activeController
-        local ret = p13.blades[1]
-        if not ret then return end
-        while ret.Parent~=game.Players.LocalPlayer.Character do ret=ret.Parent end
-        return ret
-    end
-    
-    function AttackNoCD()
-        if not AutoFarmMasDevilFruit or AutoFarmMasGun then
+	function GetCurrentBlade() 
+		local p13 = CbFw2.activeController
+		local ret = p13.blades[1]
+		if not ret then return end
+		while ret.Parent~=game.Players.LocalPlayer.Character do ret=ret.Parent end
+		return ret
+	end
+
+	function AttackNoCD()
+        if not Auto_Farm_Bounty and not Auto_Farm_Fruit or Mix_Farm then
             if not Auto_Raid then
                 local AC = CbFw2.activeController
                 for i = 1, 1 do 
@@ -2254,7 +2290,7 @@ function ClickCamera()
                 end
             end
         end
-    end
+	end
     
 --Attack Mastery
     function NormalAttack()
